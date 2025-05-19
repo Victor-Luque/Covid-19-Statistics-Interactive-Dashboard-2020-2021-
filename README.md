@@ -18,7 +18,7 @@ This interactive dashboard visualizes COVID-19 trends in U.S. states using case 
 - Formatted tooltips for county-level map
 - Clean, scrollable layout with metrics displayed in a grid
 
-##Author
-Built by: Victor Luque  
+## Author
+Built by: **Victor Luque**  
 Bachelor's in Management Information Systems and Business Analytics  
 
