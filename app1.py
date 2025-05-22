@@ -5,19 +5,14 @@ import streamlit as st
 
 try:
     # Load the COVID-19 data
-    @st.cache_data
-    def load_data():
-        df_cases = pd.read_csv("https://raw.githubusercontent.com/babdelfa/project/refs/heads/main/cases_data.csv")
-        df_deaths = pd.read_csv("https://raw.githubusercontent.com/babdelfa/project/refs/heads/main/deaths_data.csv")
-        return df_cases, df_deaths
-    df_cases, df_deaths = load_data()
+   
+    df_cases = pd.read_csv("https://raw.githubusercontent.com/babdelfa/project/refs/heads/main/cases_data.csv")
+    df_deaths = pd.read_csv("https://raw.githubusercontent.com/babdelfa/project/refs/heads/main/deaths_data.csv")
+    
 
     # Load county geometry from a local ZIP (ensure it's in the same folder as this script)
-    @st.cache_data
-    def load_geometry():
-        return gpd.read_file("counties_geometry.zip")
-    county_shapes=load_geometry()
-
+    county_shapes = gpd.read_file("counties_geomtry.zip")
+   
     # Standardize column names
     df_cases.columns = df_cases.columns.str.lower()
     df_deaths.columns = df_deaths.columns.str.lower()
