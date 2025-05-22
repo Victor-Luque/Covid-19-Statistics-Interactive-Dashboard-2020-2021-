@@ -78,43 +78,6 @@ try:
     total_deaths = stats_2020["deaths"] + stats_2021["deaths"]
 
     # Show metrics
-    st.markdown(
-        """
-        <style>
-        /* Full page background */
-        html, body, [class*="css"]  {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
-        }
-
-        .stApp {
-            background-color: transparent;
-        }
-
-        .block-container {
-            background-color: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
-            padding: 2rem;
-        }
-
-        h1, h2, h3, h4, h5, h6, p, label, span, div {
-            color: white !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
     st.markdown(f"<h2 style='font-size:28px;'>COVID-19 Summary for {input_state}</h2>", unsafe_allow_html=True)
     st.markdown(f"<h4 style='color:gray;'>Day 0: {day_0_str}</h4>", unsafe_allow_html=True)
 
