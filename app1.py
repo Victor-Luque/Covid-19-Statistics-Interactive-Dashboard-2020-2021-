@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import geopandas as gpd
 import streamlit as st
+import folium
+from streamlit_folium import st_folium
 
 try:
     # Load the COVID-19 data
@@ -127,14 +129,31 @@ try:
         gdf_filtered = gdf[gdf[state_col] == input_state]
         st.subheader(f"Choropleth Map for {input_state} as of {latest_date.strftime('%B %d, %Y')}")
         gdf_tooltip = gdf_filtered.rename(columns={"state": "State", "county": "County", "cases": "Cases", "deaths": "Deaths"})
-        map_object = gdf_tooltip.explore(
-        column="Cases",
-        cmap="Set2",
-        legend=True,
-        scheme="EqualInterval",
-        tooltip=["State", "County", "Cases", "Deaths"]
-        )
-        st.components.v1.html(map_object._repr_html_(), height=800, scrolling=True)
+        # Center the map on the selected state
+        center = [gdf_filtered.geometry.centroid.y.mean(), gdf_filtered.geometry.centroid.x.mean()]
+        m = folium.Map(location=center, zoom_start=6, tiles="CartoDB positron")
+        
+        # Add colored county polygons
+        folium.Choropleth(
+            geo_data=gdf_filtered,
+            data=gdf_filtered,
+            columns=["FIPS_BEA", "Cases"],
+            key_on="feature.properties.FIPS_BEA",
+            fill_color="YlOrRd",
+            fill_opacity=0.7,
+            line_opacity=0.2,
+            legend_name="COVID-19 Cases"
+        ).add_to(m)
+        
+        # Add tooltips
+        folium.GeoJson(
+            gdf_filtered,
+            tooltip=folium.GeoJsonTooltip(fields=["County", "State", "Cases", "Deaths"]),
+            style_function=lambda x: {"fillOpacity": 0, "color": "black", "weight": 0.5}
+        ).add_to(m)
+        
+        # Display the map
+        st_folium(m, width=900, height=600)
 except Exception as e:
     st.error("An unexpected error occurred while loading the app. Please try again later.")
    
