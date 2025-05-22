@@ -137,7 +137,7 @@ try:
         folium.Choropleth(
             geo_data=gdf_filtered,
             data=gdf_filtered,
-            columns=["FIPS_BEA", "Cases"],
+            columns=["fips", "Cases"],
             key_on="feature.properties.FIPS_BEA",
             fill_color="YlOrRd",
             fill_opacity=0.7,
