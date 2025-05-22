@@ -121,36 +121,50 @@ try:
     elif option == "Choropleth Map":
         latest_date = df_merged['date'].max()
         latest_df = df_merged[df_merged['date'] == latest_date]
+        
+        # Summarize cases and deaths
         state_cases = latest_df.groupby(["county_state", "county", "fips", state_col], as_index=False)[["cases", "deaths"]].sum()
+        
+        # Merge with geometry data
         gdf = pd.merge(county_shapes, state_cases, left_on="FIPS_BEA", right_on="fips")
         gdf_filtered = gdf[gdf[state_col] == input_state]
-
+    
+        # Prepare for display
         gdf_filtered = gdf_filtered.rename(columns={
             "state": "State", "county": "County", "cases": "Cases", "deaths": "Deaths"
         })
-
+    
+        # Ensure FIPS is string type with 5 digits
+        gdf_filtered["fips"] = gdf_filtered["fips"].astype(str).str.zfill(5)
+    
+        # Create GeoJSON for Folium
         geojson_data = gdf_filtered.to_json()
         center = [gdf_filtered.geometry.centroid.y.mean(), gdf_filtered.geometry.centroid.x.mean()]
         m = folium.Map(location=center, zoom_start=6, tiles="CartoDB positron")
-
+    
+        # Add Choropleth layer
         folium.Choropleth(
             geo_data=geojson_data,
             data=gdf_filtered,
-            columns=["fips", "cases"],
+            columns=["fips", "Cases"],
             key_on="feature.properties.fips",
             fill_color="YlOrRd",
             fill_opacity=0.7,
             line_opacity=0.2,
             legend_name="COVID-19 Cases"
         ).add_to(m)
-
+    
+        # Add tooltips
         folium.GeoJson(
             geojson_data,
             tooltip=folium.GeoJsonTooltip(fields=["County", "State", "Cases", "Deaths"]),
             style_function=lambda x: {"fillOpacity": 0, "color": "black", "weight": 0.5}
         ).add_to(m)
-
+    
+        # Display map in Streamlit
+        st.subheader(f"Choropleth Map for {input_state} as of {latest_date.strftime('%B %d, %Y')}")
         st_folium(m, width=900, height=600)
+
 
 except Exception as e:
     st.error("An unexpected error occurred while loading the app. Please try again later.")
