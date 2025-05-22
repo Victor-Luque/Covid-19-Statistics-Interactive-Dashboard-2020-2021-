@@ -5,3 +5,4 @@ matplotlib
 folium
 fsspec
 requests
+streamlit-folium
