@@ -7,14 +7,12 @@ from streamlit_folium import st_folium
 
 try:
     # Load the COVID-19 data
-   
     df_cases = pd.read_csv("https://raw.githubusercontent.com/babdelfa/project/refs/heads/main/cases_data.csv")
     df_deaths = pd.read_csv("https://raw.githubusercontent.com/babdelfa/project/refs/heads/main/deaths_data.csv")
-    
 
     # Load county geometry from a local ZIP (ensure it's in the same folder as this script)
     county_shapes = gpd.read_file("counties_geometry.zip")
-   
+
     # Standardize column names
     df_cases.columns = df_cases.columns.str.lower()
     df_deaths.columns = df_deaths.columns.str.lower()
@@ -29,7 +27,6 @@ try:
         st.stop()
 
     # Streamlit UI
-
     st.set_page_config(page_title="COVID-19 Dashboard", layout="wide")
     st.title("COVID-19 Dashboard")
     st.subheader("U.S. Cases & Deaths Trends (2020-2021)")
@@ -96,7 +93,7 @@ try:
     col8.metric("2021 Avg Daily Deaths", f"{stats_2021['avg_new_deaths']:,.2f}")
     col9.metric("Total Cases (2020–2021)", f"{total_cases:,}")
 
-    # Row 4 (optional)
+    # Row 4
     st.metric("Total Deaths (2020–2021)", f"{total_deaths:,}")
 
     # Visualization
@@ -113,49 +110,47 @@ try:
         ax[1, 0].set_title("Daily New Deaths", fontweight='bold')
         ax[1, 1].plot(combined.groupby("date")["deaths"].sum().index, combined.groupby("date")["deaths"].sum())
         ax[1, 1].set_title("Cumulative Deaths", fontweight='bold')
-        plt.suptitle(f"{input_state} COVID-19 Report for {name}", size =23)
-        plt.tight_layout(pad=5) 
+        plt.suptitle(f"{input_state} COVID-19 Report for {name}", size=23)
+        plt.tight_layout(pad=5)
 
         for a in ax.flat:
             a.set_xlabel("Date")
             a.tick_params(axis="x", rotation=45)
         st.pyplot(fig)
 
-   elif option == "Choropleth Map":
+    elif option == "Choropleth Map":
         latest_date = df_merged['date'].max()
         latest_df = df_merged[df_merged['date'] == latest_date]
         state_cases = latest_df.groupby(["county_state", "county", "fips", state_col], as_index=False)[["cases", "deaths"]].sum()
-        gdf = pd.merge(county_shapes, state_cases, left_on="FIPS_BEA", right_on="fips")  # Change if needed
+        gdf = pd.merge(county_shapes, state_cases, left_on="FIPS_BEA", right_on="fips")
         gdf_filtered = gdf[gdf[state_col] == input_state]
-    
+
         gdf_filtered = gdf_filtered.rename(columns={
             "state": "State", "county": "County", "cases": "Cases", "deaths": "Deaths"
         })
-    
-        # Convert to GeoJSON
+
         geojson_data = gdf_filtered.to_json()
-    
         center = [gdf_filtered.geometry.centroid.y.mean(), gdf_filtered.geometry.centroid.x.mean()]
         m = folium.Map(location=center, zoom_start=6, tiles="CartoDB positron")
-    
+
         folium.Choropleth(
             geo_data=geojson_data,
             data=gdf_filtered,
-            columns=["fips", "Cases"],  # adjust to match column name
+            columns=["fips", "cases"],
             key_on="feature.properties.fips",
             fill_color="YlOrRd",
             fill_opacity=0.7,
             line_opacity=0.2,
             legend_name="COVID-19 Cases"
         ).add_to(m)
-    
+
         folium.GeoJson(
             geojson_data,
             tooltip=folium.GeoJsonTooltip(fields=["County", "State", "Cases", "Deaths"]),
             style_function=lambda x: {"fillOpacity": 0, "color": "black", "weight": 0.5}
         ).add_to(m)
-    
+
         st_folium(m, width=900, height=600)
+
 except Exception as e:
     st.error("An unexpected error occurred while loading the app. Please try again later.")
-   
