@@ -11,7 +11,7 @@ try:
     
 
     # Load county geometry from a local ZIP (ensure it's in the same folder as this script)
-    county_shapes = gpd.read_file("counties_geomtry.zip")
+    county_shapes = gpd.read_file("counties_geometry.zip")
    
     # Standardize column names
     df_cases.columns = df_cases.columns.str.lower()
