@@ -1,4 +1,4 @@
-# Covid-19-Statistics-Interactive-Dashboard-2020-2021- 
+# Covid-19-Statistics-Interactive-Dashboard 
 ## 🔗 Live Demo
 👉 [Click here to try the dashboard](https://qzddkzeholggsx6twdbdhz.streamlit.app/)
 
